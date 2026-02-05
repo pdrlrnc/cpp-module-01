@@ -21,9 +21,7 @@ int main(int argc, char **argv)
 	{
 		std::ofstream outfile(getOutfileName(argv[1]).c_str());
 		if (outfile.is_open())
-		{
 			findAndReplace(infile, outfile, argv[2], argv[3]);
-		}
 		else 
 		{
 			std::cout
@@ -42,23 +40,30 @@ int main(int argc, char **argv)
 void findAndReplace(std::ifstream& infile, std::ofstream& outfile, std::string s1, std::string s2)
 {
 	std::string line;
+	std::string replace_line;
+	char *c = new char[2];
 
 	while (std::getline(infile, line, s1[0]))
 	{
 		outfile << line;
-		char* replaced_line = new char[s1.length()];
-		for (size_t i = 0; i < s1.length(); i++)
+		c[0] = s1[0];
+		c[1] = '\0';
+		replace_line.append(c);
+		infile.get(c, 2);
+		for (size_t i = 1; i < s1.length(); i++)
 		{
-			infile.get(replaced_line, 1);
-			if (replaced_line[i] != s1[i])
+			if (*c != s1[i])
 				break;
+			replace_line.append(c);
+			infile.get(c, 2);
 		}
-		if (replaced_line == s1)
+		if (replace_line == s1)
 			outfile << s2;
 		else 
-			outfile << replaced_line;
-		delete[] replaced_line;
+			outfile << replace_line;
+		replace_line.clear();
 	}
+	delete[] c;
 
 }
 
