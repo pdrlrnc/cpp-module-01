@@ -5,6 +5,7 @@
 /*prototypes*/
 std::string getOutfileName(std::string infile);
 void findAndReplace(std::ifstream& infile, std::ofstream& outfile, std::string s1, std::string s2);
+std::string replace(std::string line, std::string s1, std::string s2);
 
 
 int main(int argc, char **argv)
@@ -37,34 +38,29 @@ int main(int argc, char **argv)
 	}
 }
 
+std::string replace(std::string line, std::string s1, std::string s2)
+{
+	std::string replaced_line;
+
+	for (size_t i = 0; i < line.length(); i++)
+	{
+		if (line.substr(i, s1.length()) == s1)
+		{
+			replaced_line.append(s2);
+			i += s1.length() - 1;
+		}
+		else 
+			replaced_line += line[i];
+	}	
+	return (replaced_line);
+}
+
 void findAndReplace(std::ifstream& infile, std::ofstream& outfile, std::string s1, std::string s2)
 {
 	std::string line;
-	std::string replace_line;
-	char *c = new char[2];
 
-	while (std::getline(infile, line, s1[0]))
-	{
-		outfile << line;
-		c[0] = s1[0];
-		c[1] = '\0';
-		replace_line.append(c);
-		infile.get(c, 2);
-		for (size_t i = 1; i < s1.length(); i++)
-		{
-			if (*c != s1[i])
-				break;
-			replace_line.append(c);
-			infile.get(c, 2);
-		}
-		if (replace_line == s1)
-			outfile << s2;
-		else 
-			outfile << replace_line;
-		replace_line.clear();
-	}
-	delete[] c;
-
+	while (std::getline(infile, line, '\n'))
+		outfile << replace(line, s1, s2) << std::endl;
 }
 
 std::string getOutfileName(std::string infile)
